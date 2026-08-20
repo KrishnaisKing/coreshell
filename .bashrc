@@ -1,0 +1,1 @@
+   export MP_API_KEY="7U1xvLgrQ4mHenF5A78SQHJeVlvGFIrw"
