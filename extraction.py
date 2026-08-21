@@ -273,6 +273,14 @@ def build_core_shell_pairs(mp_df, core_gap_range=(2.78, 3.18), shell_gap_range=(
         ).drop("key", axis=1)
 
         merged = merged[merged["band_gap_eV_shell"] > merged["band_gap_eV_core"]]
+        # Exclude same-formula pairs. cores/shells are each deduplicated to
+        # one entry per formula WITHIN their own pool, but a compound with
+        # two polymorphs (different mp_id, different computed band gap) can
+        # land in BOTH pools -- e.g. one KIO3 polymorph at 2.79 eV (core
+        # range) and another KIO3 polymorph at 3.4x eV (shell range). That
+        # produced "KIO3 core / KIO3 shell" pairs, which isn't a real
+        # core-shell material -- a compound can't confine itself.
+        merged = merged[merged["formula_core"] != merged["formula_shell"]]
         # Require a real gap separation, not just any positive difference -
         # without this, dEc+dEv is often trivially small and both offsets
         # clear a low 0.1 eV floor almost by default (this is what caused
